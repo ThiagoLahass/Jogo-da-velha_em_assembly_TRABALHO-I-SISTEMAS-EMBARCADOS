@@ -1,0 +1,18 @@
+	DEBUGGER:
+
+	mount L C:\Users\thiag\Desktop
+	L:
+	debug
+
+COMPILAR:
+
+	nasm teste.asm
+	
+LINKAR:
+	freelink teste
+
+DEBUG:
+	debug teste.exe
+
+RODAR:
+	teste
