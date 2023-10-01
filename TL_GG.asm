@@ -656,8 +656,8 @@ magenta_claro	equ		13
 amarelo			equ		14
 branco_intenso	equ		15
 
-raio			equ		55
-lado			equ		55
+raio			equ		45
+lado			equ		45
 
 modo_anterior	db		0
 linha   		dw  	0

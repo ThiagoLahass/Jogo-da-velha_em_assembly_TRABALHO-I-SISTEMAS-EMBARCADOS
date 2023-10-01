@@ -118,7 +118,7 @@
    118 000000D1 50                      	push	ax
    119 000000D2 B8FF00                  	mov		ax, 255
    120 000000D5 50                      	push	ax
-   121 000000D6 B83700                  	mov		ax, raio
+   121 000000D6 B82D00                  	mov		ax, raio
    122 000000D9 50                      	push	ax
    123 000000DA E8CC00                  	call 	circle
    124                                  
@@ -128,7 +128,7 @@
    128 000000E5 50                      	push	ax
    129 000000E6 B87D00                  	mov		ax,125
    130 000000E9 50                      	push	ax
-   131 000000EA B83700                  	mov		ax, lado
+   131 000000EA B82D00                  	mov		ax, lado
    132 000000ED 50                      	push	ax
    133 000000EE E81000                  	call	desenha_x
    134                                  
@@ -656,8 +656,8 @@
    656                                  amarelo			equ		14
    657                                  branco_intenso	equ		15
    658                                  
-   659                                  raio			equ		55
-   660                                  lado			equ		55
+   659                                  raio			equ		45
+   660                                  lado			equ		45
    661                                  
    662 00000001 00                      modo_anterior	db		0
    663 00000002 0000                    linha   		dw  	0
