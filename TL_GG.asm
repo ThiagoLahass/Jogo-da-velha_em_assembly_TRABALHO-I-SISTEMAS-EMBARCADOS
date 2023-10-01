@@ -118,7 +118,7 @@ lm3:
 	push	ax
 	mov		ax, 255
 	push	ax
-	mov		ax, 55
+	mov		ax, raio
 	push	ax
 	call 	circle
 
@@ -128,7 +128,7 @@ lm3:
 	push	ax
 	mov		ax,125
 	push	ax
-	mov		ax,55
+	mov		ax, lado
 	push	ax
 	call	desenha_x
 
@@ -143,12 +143,16 @@ lm3:
 	mov     ax,4c00h
 	int     21h
 
+;===========================================================================
+;========================== FIM DO PROGRAMA ================================
+;===========================================================================
 
 ;***************************************************************************
 ;
 ;   função desenha_x
+;	lado estático de 'lado'px == 55 px
 ;
-; push xc; push yc; push l; call desenha_x;  (xc+l<639,yc+l<479)e(xc-l>0,yc-l>0)
+; push xc; push yc; call desenha_x;  (xc+l<639,yc+l<479)e(xc-l>0,yc-l>0)
 ; cor definida na variavel cor
 desenha_x:
 	push 	bp
@@ -163,18 +167,18 @@ desenha_x:
 	
 	mov		ax,[bp+8]   	; resgata xc
 	mov		bx,[bp+6]    	; resgata yc
-	mov		cx,[bp+4]    	; resgata l
+	mov		cx,[bp+4]		; resgata l
 	
 	;desenha primeira diagonal
 	mov 	dx,ax			
-	sub		dx,cx			; Ponto inferior esquerdo
+	sub		dx,cx	; Ponto inferior esquerdo
 	push	dx
 	mov 	dx,bx
 	sub		dx,cx
 	push    dx
 
 	mov 	dx,ax
-	add		dx,cx			; Ponto superior direito
+	add		dx,cx	; Ponto superior direito
 	push	dx
 	mov 	dx,bx
 	add		dx,cx
@@ -184,14 +188,14 @@ desenha_x:
 
 	;desenha segunda diagonal
 	mov 	dx,ax			
-	add		dx,cx			; Ponto inferior direito
+	add		dx,cx	; Ponto inferior direito
 	push	dx
 	mov 	dx,bx
 	sub		dx,cx
 	push    dx
 
 	mov 	dx,ax
-	sub		dx,cx			; Ponto superior esquerdo
+	sub		dx,cx	; Ponto superior esquerdo
 	push	dx
 	mov 	dx,bx
 	add		dx,cx
@@ -236,6 +240,8 @@ cursor:
 	pop		ax
 	popf
 	ret
+
+
 ;_____________________________________________________________________________
 ;
 ; função caracter escrito na posisão do cursor
@@ -265,6 +271,8 @@ caracter:
 	pop		ax
 	popf
 	ret
+
+
 ;_____________________________________________________________________________
 ;
 ;   função plot_xy
@@ -297,6 +305,8 @@ plot_xy:
 	popf
 	pop		bp
 	ret		4
+
+
 ;_____________________________________________________________________________
 ;    função circle
 ;	 push xc; push yc; push r; call circle;  (xc+r<639,yc+r<479)e(xc-r>0,yc-r>0)
@@ -440,135 +450,8 @@ fim_circle:
 	popf
 	pop		bp
 	ret		6
-;-----------------------------------------------------------------------------
-;    função full_circle
-;	 push xc; push yc; push r; call full_circle;  (xc+r<639,yc+r<479)e(xc-r>0,yc-r>0)
-; cor definida na variavel cor					  
-full_circle:
-	push 	bp
-	mov	 	bp,sp
-	pushf                	;coloca os flags na pilha
-	push 	ax
-	push 	bx
-	push	cx
-	push	dx
-	push	si
-	push	di
 
-	mov		ax,[bp+8]    	; resgata xc
-	mov		bx,[bp+6]   	; resgata yc
-	mov		cx,[bp+4]    	; resgata r
-	
-	mov		si,bx
-	sub		si,cx
-	push    ax				;coloca xc na pilha			
-	push	si				;coloca yc-r na pilha
-	mov		si,bx
-	add		si,cx
-	push	ax				;coloca xc na pilha
-	push	si				;coloca yc+r na pilha
-	call 	line
-	
-		
-	mov		di,cx
-	sub		di,1	 		;di=r-1
-	mov		dx,0  			;dx será a variável x. cx é a variavel y
-	
-;aqui em cima a lógica foi invertida, 1-r => r-1
-;e as comparações passaram a ser jl => jg, assim garante 
-;valores positivos para d
 
-stay_full:					;loop
-	mov		si,di
-	cmp		si,0
-	jg		inf_full       	;caso d for menor que 0, seleciona pixel superior (não  salta)
-	mov		si,dx			;o jl é importante porque trata-se de conta com sinal
-	sal		si,1			;multiplica por doi (shift arithmetic left)
-	add		si,3
-	add		di,si     		;nesse ponto d=d+2*dx+3
-	inc		dx				;incrementa dx
-	jmp		plotar_full
-inf_full:	
-	mov		si,dx
-	sub		si,cx  			;faz x - y (dx-cx), e salva em di 
-	sal		si,1
-	add		si,5
-	add		di,si			;nesse ponto d=d+2*(dx-cx)+5
-	inc		dx				;incrementa x (dx)
-	dec		cx				;decrementa y (cx)
-	
-plotar_full:	
-	mov		si,ax
-	add		si,cx
-	push	si				;coloca a abcisa y+xc na pilha			
-	mov		si,bx
-	sub		si,dx
-	push    si				;coloca a ordenada yc-x na pilha
-	mov		si,ax
-	add		si,cx
-	push	si				;coloca a abcisa y+xc na pilha	
-	mov		si,bx
-	add		si,dx
-	push    si				;coloca a ordenada yc+x na pilha	
-	call 	line
-	
-	mov		si,ax
-	add		si,dx
-	push	si				;coloca a abcisa xc+x na pilha			
-	mov		si,bx
-	sub		si,cx
-	push    si				;coloca a ordenada yc-y na pilha
-	mov		si,ax
-	add		si,dx
-	push	si				;coloca a abcisa xc+x na pilha	
-	mov		si,bx
-	add		si,cx
-	push    si				;coloca a ordenada yc+y na pilha	
-	call	line
-	
-	mov		si,ax
-	sub		si,dx
-	push	si				;coloca a abcisa xc-x na pilha			
-	mov		si,bx
-	sub		si,cx
-	push    si				;coloca a ordenada yc-y na pilha
-	mov		si,ax
-	sub		si,dx
-	push	si				;coloca a abcisa xc-x na pilha	
-	mov		si,bx
-	add		si,cx
-	push    si				;coloca a ordenada yc+y na pilha	
-	call	line
-	
-	mov		si,ax
-	sub		si,cx
-	push	si				;coloca a abcisa xc-y na pilha			
-	mov		si,bx
-	sub		si,dx
-	push    si				;coloca a ordenada yc-x na pilha
-	mov		si,ax
-	sub		si,cx
-	push	si				;coloca a abcisa xc-y na pilha	
-	mov		si,bx
-	add		si,dx
-	push    si				;coloca a ordenada yc+x na pilha	
-	call	line
-	
-	cmp		cx,dx
-	jb		fim_full_circle	;se cx (y) está abaixo de dx (x), termina     
-	jmp		stay_full		;se cx (y) está acima de dx (x), continua no loop
-	
-	
-fim_full_circle:
-	pop		di
-	pop		si
-	pop		dx
-	pop		cx
-	pop		bx
-	pop		ax
-	popf
-	pop		bp
-	ret		6
 ;-----------------------------------------------------------------------------
 ;
 ;   função line
@@ -732,6 +615,8 @@ fim_line:
 	pop		bp
 	ret		8
 ;*******************************************************************
+
+
 segment data
 
 cor			db		branco_intenso
@@ -771,6 +656,9 @@ magenta_claro	equ		13
 amarelo			equ		14
 branco_intenso	equ		15
 
+raio			equ		55
+lado			equ		55
+
 modo_anterior	db		0
 linha   		dw  	0
 coluna  		dw  	0
@@ -779,6 +667,8 @@ deltay			dw		0
 titulo    		db  	'JOGO DA VELHA'
 comando			db		'Campo de Comando'
 mensagem		db		'Campo de Mensagem'
+
+
 ;*************************************************************************
 segment stack stack
     			resb 	512
