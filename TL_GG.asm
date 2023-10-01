@@ -66,8 +66,7 @@ segment code
 	push	ax
 	mov		ax,450
 	push	ax
-	call	line		
-
+	call	line
 
 ;escrever mensagem topo "JOGO DA VELHA"
 	mov     cx,13					;número de caracteres
@@ -113,6 +112,27 @@ lm3:
 	loop    lm3
 
 
+;desenhar um circulo na posicão [320,255] e raio 55px (só para testes por enquanto)
+	mov		byte[cor], vermelho
+	mov		ax, 320
+	push	ax
+	mov		ax, 255
+	push	ax
+	mov		ax, 55
+	push	ax
+	call 	circle
+
+;desenhar um x na posicão [190,125] (centro), com lado 2*55 = 110px
+	mov		byte[cor], azul
+	mov		ax,190
+	push	ax
+	mov		ax,125
+	push	ax
+	mov		ax,55
+	push	ax
+	call	desenha_x
+
+
 ; TERMINAR EXECUÇÃO DO PROGRAMA
 ; reseta o modo de video
 	mov    	ah,08h
@@ -122,6 +142,72 @@ lm3:
 	int  	10h
 	mov     ax,4c00h
 	int     21h
+
+
+;***************************************************************************
+;
+;   função desenha_x
+;
+; push xc; push yc; push l; call desenha_x;  (xc+l<639,yc+l<479)e(xc-l>0,yc-l>0)
+; cor definida na variavel cor
+desenha_x:
+	push 	bp
+	mov	 	bp,sp
+	pushf               	;coloca os flags na pilha
+	push 	ax
+	push 	bx
+	push	cx
+	push	dx
+	push	si
+	push	di
+	
+	mov		ax,[bp+8]   	; resgata xc
+	mov		bx,[bp+6]    	; resgata yc
+	mov		cx,[bp+4]    	; resgata l
+	
+	;desenha primeira diagonal
+	mov 	dx,ax			
+	sub		dx,cx			; Ponto inferior esquerdo
+	push	dx
+	mov 	dx,bx
+	sub		dx,cx
+	push    dx
+
+	mov 	dx,ax
+	add		dx,cx			; Ponto superior direito
+	push	dx
+	mov 	dx,bx
+	add		dx,cx
+	push    dx
+
+	call line
+
+	;desenha segunda diagonal
+	mov 	dx,ax			
+	add		dx,cx			; Ponto inferior direito
+	push	dx
+	mov 	dx,bx
+	sub		dx,cx
+	push    dx
+
+	mov 	dx,ax
+	sub		dx,cx			; Ponto superior esquerdo
+	push	dx
+	mov 	dx,bx
+	add		dx,cx
+	push    dx
+
+	call line
+
+	pop		di
+	pop		si
+	pop		dx
+	pop		cx
+	pop		bx
+	pop		ax
+	popf
+	pop		bp
+	ret		6
 
 
 ;***************************************************************************
