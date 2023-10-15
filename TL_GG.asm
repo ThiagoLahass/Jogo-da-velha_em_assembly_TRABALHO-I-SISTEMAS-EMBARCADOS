@@ -70,9 +70,9 @@ L1:
 		jg 		verifica_tamanho				; se apertou mais de 2 teclas -> verifica o tamanho do vetor
 		; se apertou somente Enter
 		cmp 	byte [resultado], 0				; verifica se digitou apos fim do jogo
+		je 		enter_inv
 		call 	imprime_msg_apos_fim_jogo
 		jmp 	limpa_vetor
-		je 		enter_inv
 	enter_inv:
 		call 	imprime_comando_inv				; se apertou só Enter -> comando inválido
 		jmp		limpa_vetor
@@ -266,8 +266,88 @@ inicia_jogo:
 		inc		byte [cor]				;mudar a cor para a seguinte
 		loop    lm1
 
+	mov		byte[cor],branco
+	;desenhar caixa de comando
+	;[5,50]->[635,50] -> HORIZONTAL
+	mov		ax,5
+	push	ax
+	mov		ax,50
+	push	ax
+	mov		ax,635
+	push	ax
+	mov		ax,50
+	push	ax
+	call	line
+
+	;[5,30]->[635,30] -> HORIZONTAL
+	mov		ax,5
+	push	ax
+	mov		ax,30
+	push	ax
+	mov		ax,635
+	push	ax
+	mov		ax,30
+	push	ax
+	call	line
+
+	;[5,30]->[5,50] -> VERTICAL
+	mov		ax,5
+	push	ax
+	mov		ax,30
+	push	ax
+	mov		ax,5
+	push	ax
+	mov		ax,50
+	push	ax
+	call	line
+
+	;[635,30]->[635,50] -> VERTICAL
+	mov		ax,635
+	push	ax
+	mov		ax,30
+	push	ax
+	mov		ax,635
+	push	ax
+	mov		ax,50
+	push	ax
+	call	line
+
+	;desenhar caixa de mensagem
+	;[5,20]->[635,20] -> HORIZONTAL
+	mov		ax,5
+	push	ax
+	mov		ax,20
+	push	ax
+	mov		ax,635
+	push	ax
+	mov		ax,20
+	push	ax
+	call	line
+
+	;[5,30]->[5,50] -> VERTICAL
+	mov		ax,5
+	push	ax
+	mov		ax,0
+	push	ax
+	mov		ax,5
+	push	ax
+	mov		ax,20
+	push	ax
+	call	line
+
+	;[635,30]->[635,50] -> VERTICAL
+	mov		ax,635
+	push	ax
+	mov		ax,0
+	push	ax
+	mov		ax,635
+	push	ax
+	mov		ax,20
+	push	ax
+	call	line
+
 	;escrever mensagem de comando
-		mov     cx,16					;número de caracteres
+		mov     cx,17					;número de caracteres
 		mov     bx,0
 		mov     dh,27					;linha 0-29
 		mov     dl,2					;coluna 0-79
@@ -281,7 +361,7 @@ inicia_jogo:
 		loop    lm2
 
 	;escrever mensagem de mensagens
-		mov     cx,17					;número de caracteres
+		mov     cx,18					;número de caracteres
 		mov     bx,0
 		mov     dh,29					;linha 0-29
 		mov     dl,2					;coluna 0-79
@@ -1830,8 +1910,8 @@ segment data
 	deltax			dw		0
 	deltay			dw		0	
 	titulo    		db  	'JOGO DA VELHA'
-	campo_comando	db		'Campo de Comando'
-	campo_mensagem	db		'Campo de Mensagem'
+	campo_comando	db		'Campo de Comando:'
+	campo_mensagem	db		'Campo de Mensagem:'
 	celulas			db		'112131122232132333'
 	msg_com_inv		db		'Comando Invalido'
 	msg_jog_inv		db		'Jogada Invalida'
