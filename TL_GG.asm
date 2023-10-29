@@ -1,4 +1,8 @@
 ; Grupo: Gabriel Gatti e Thiago Lahass
+; Observação: como fizemos a leitura do programa nos baseando no código tecbuf.asm, o jogo tem algumas limitações:
+; - para escrever o x ou c maiúsculos deve-se usar o shift esquerdo
+; - para digitar as linhas e colunas, os números do tecado numérico não são reconhecidos (deve-se usar os que ficam acima das letras)
+; - o enter do teclado numérico não é reconhecido 
 
 extern inicia_jogo, caracter, circle, cursor, desenha_x, line, plot_xy, imprime_ultima_jog, imprime_jogada_inv, imprime_comando_inv, imprime_x_venceu, imprime_c_venceu, imprime_empatou, imprime_msg_apos_fim_jogo, limpa_campo_com, limpa_campo_msg, marca_celula11, marca_celula12, marca_celula13, marca_celula21, marca_celula22, marca_celula23, marca_celula31, marca_celula32, marca_celula33, f_verifica_leitura_jogada, func_verifica_jogada, f_verifica_ganhador, marca_ganhador
 
@@ -12,6 +16,7 @@ segment code
 	mov 	ss,ax
 	mov 	sp,stacktop
 
+	; ==================== Trecho de código retirado do programa tecbuf.asm fornecido pelo professor ====================
 	CLI											; Deshabilita INTerrupções por hardware - pin INTR NÃO atende INTerrupções externas	
 	XOR     AX, AX								; Limpa o registrador AX, é equivalente a fazer "MOV AX,0"
 	MOV     ES, AX								; Inicializa o registrador de Segmento Extra ES para acessar à região de vetores de INTerrupção (posição zero de memoria)
@@ -22,11 +27,12 @@ segment code
 	MOV     [ES:INT9*4+2], CS					; Atualiza o valor do CS do vector de INTerrupção 9 com o CS do programa atual 
 	MOV     WORD [ES:INT9*4],keyINT         	; Atualiza o valor do IP do vector de INTerrupção 9 com o offset "keyINT" do programa atual
 	STI											; Habilita INTerrupções por hardware - pin INTR SIM atende INTerrupções externas
-
+	; ===================================================================================================================
 	call inicia_jogo
 
 ;leitura de comando
 L1:
+        ; ==================== Trecho de código retirado do programa tecbuf.asm fornecido pelo professor ====================
         MOV     AX,[p_i]	        			; loop - se não tem tecla pulsada, não faz nada! p_i só é atualizado (p_i = p_i + 1) na Rotina de Serviço de INTerrupção (ISR) "keyINT" 
         CMP     AX,[p_t]
         JE      L1
@@ -35,6 +41,7 @@ L1:
         MOV     BX,[p_t]						; Carrega em BX o valor de p_t
         XOR     AX, AX
         MOV     AL, [BX+tecla]					; Carrega em AL o valor da variável tecla (variável atualizada durante a ISR) mais o offset BX, AL <- [BX+tecla]  
+		; ===================================================================================================================iável tecla (variável atualizada durante a ISR) mais o offset BX, AL <- [BX+tecla]  
 		
 		mov		bx, [i_atual_comando]			; carrega em bx o indice do vetor de comando
 		mov 	[comando+bx], al				; transfere o valor make/break da tecla digitada
@@ -147,6 +154,7 @@ L1:
 ; TERMINAR EXECUÇÃO DO PROGRAMA
 ; reseta o modo de video
 L2:
+ 	; ==================== Trecho de código retirado do programa tecbuf.asm fornecido pelo professor ====================
  	CLI									; Deshabilita INTerrupções por hardware - pin INTR NÃO atende INTerrupções externas
 	XOR     AX, AX						; Limpa o registrador AX, é equivalente a fazer "MOV AX,0"				
 	MOV     ES, AX						; Inicializa o registrador de Segmento Extra ES para acessar à região de vetores de INTerrupção (posição zero de memoria)
@@ -154,6 +162,7 @@ L2:
 	MOV     [ES:INT9*4+2], AX			; Atualiza o valor do CS do vector de INTerrupção 9 que foi salvo na variável cs_dos
 	MOV     AX, [offset_dos]			; Carrega em AX o valor do IP do vector de INTerrupção 9 que foi salvo na variável offset_dos -> linha 23
 	MOV     [ES:INT9*4], AX 			; Atualiza o valor do IP do vector de INTerrupção 9 que foi salvo na variável offset_dos
+	; ===================================================================================================================
 	
 	mov    	ah,08h
 	int     21h
@@ -167,6 +176,7 @@ L2:
 ;========================== FIM DO PROGRAMA ================================
 ;===========================================================================
 
+; ==================== Trecho de código retirado do programa tecbuf.asm fornecido pelo professor ====================
 keyINT:								; Este segmento de código só será executado se uma tecla for presionada, ou seja, se a INT 9h for acionada!
         PUSH    AX					; Salva contexto na pilha
         PUSH    BX
@@ -190,6 +200,7 @@ keyINT:								; Este segmento de código só será executado se uma tecla for p
         POP     BX
         POP     AX
         IRET						; Retorna da interrupção
+; ===================================================================================================================
 
 
 ;*******************************************************************
@@ -197,6 +208,7 @@ keyINT:								; Este segmento de código só será executado se uma tecla for p
 
 segment data
 
+	; ==================== Trecho de código retirado do programa tecbuf.asm fornecido pelo professor ====================
 	kb_data EQU 60h  			; PORTA DE LEITURA DE TECLADO
 	kb_ctl  EQU 61h  			; PORTA DE RESET PARA PEDIR NOVA INTERRUPCAO
 	pictrl  EQU 20h				; PORTA DO PIC DE TECLADO
@@ -207,6 +219,7 @@ segment data
 	tecla   resb  8				; Variável de 8 bytes para armacenar a tecla presionada. Só precisa de 2 bytes!	 
 	p_i     dw  0   			; Indice p/ Interrupcao (Incrementa na ISR quando pressiona/solta qualquer tecla)  
 	p_t     dw  0   			; Indice p/ Interrupcao (Incrementa após retornar da ISR quando pressiona/solta qualquer tecla) 
+	; ===================================================================================================================
 
 	i_atual_comando 	dw 0		; Índice atual do vetor de comando sendo digitado
 	tam_max_vet_comando	equ 16

@@ -84,7 +84,6 @@ inicia_jogo:
 		inc		byte [cor]				;mudar a cor para a seguinte
 		loop    lm1
 
-	mov		byte[cor],branco
 	;desenhar caixa de comando
 	;[5,50]->[635,50] -> HORIZONTAL
 	mov		ax,5
@@ -223,6 +222,29 @@ inicia_jogo:
 		mov 	dl,49
 	cont1:
 		loop    lm4
+
+	;escrever mensagem de como jogar
+		mov     cx,70					;número de caracteres
+		mov     bx,0
+		mov		ah,12					;valor para comparar e saber se já escreveu a linha toda
+		mov     dh,3					;linha 0-29
+		mov     dl,0					;coluna 0-79
+		mov		byte[cor],branco
+	lm5:
+		call	cursor
+		mov     al,[bx+msg_como_jogar]
+		call	caracter
+		inc     bx						;proximo caracter
+		inc		dl						;avanca a coluna
+		cmp 	bl,ah					;se ainda não escreveu a linha toda, continua
+		jl		cont2
+		;se já, muda para a linha abaixo
+		add 	ah,12
+		sub 	dl,12
+		add 	dh,1
+	cont2:
+		loop    lm5
+
 	mov word [i_atual_comando], 0
 	ret
 
@@ -235,3 +257,4 @@ segment data
     titulo    		db  	'JOGO DA VELHA'
     campo_comando	db		'Campo de Comando:'
 	campo_mensagem	db		'Campo de Mensagem:'
+	msg_como_jogar	db		'Use o left  shift e nao use teclado numerico    para digitaras jogadas'
